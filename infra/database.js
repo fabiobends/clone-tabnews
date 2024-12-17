@@ -1,11 +1,6 @@
 import pg from "pg";
 const { Client } = pg;
 
-import dotenv from "dotenv";
-dotenv.config({
-  path: "./.env.development",
-});
-
 const getSSLOptions = () => {
   if (process.env.POSTGRES_CA) {
     return {
