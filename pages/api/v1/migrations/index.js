@@ -3,36 +3,34 @@ import { join } from "node:path";
 import database from "infra/database";
 
 export default async function handler(req, res) {
-  const dbClient = await database.getNewClient();
-
-  const defaultOptions = {
-    dbClient,
-    dir: join("infra", "migrations"),
-    verbose: true,
-    direction: "up",
-    migrationsTable: "pgmigrations",
-  };
-
-  if (req.method === "GET") {
-    const pendingMigrations = await migrationRunner({
-      ...defaultOptions,
-      dryRun: true,
+  if (req.method !== "GET" && req.method !== "POST") {
+    return res.status(405).json({
+      message: "Method not allowed",
     });
-
-    await dbClient.end();
-    return res.status(200).json(pendingMigrations);
   }
 
-  if (req.method === "POST") {
-    const migratedMigrations = await migrationRunner({
-      ...defaultOptions,
-      dryRun: false,
-    });
+  let dbClient;
+  try {
+    dbClient = await database.getNewClient();
+    const dryRun = req.method === "GET";
 
-    await dbClient.end();
-    const statusCode = migratedMigrations.length > 0 ? 201 : 200;
-    return res.status(statusCode).json(migratedMigrations);
+    const defaultOptions = {
+      dbClient,
+      dir: join("infra", "migrations"),
+      verbose: true,
+      direction: "up",
+      migrationsTable: "pgmigrations",
+      dryRun,
+    };
+
+    const migrations = await migrationRunner(defaultOptions);
+    const hasNoMigrations = migrations.length === 0;
+    const statusCode = hasNoMigrations || dryRun ? 200 : 201;
+    return res.status(statusCode).json(migrations);
+  } catch (error) {
+    console.error(error);
+    throw error;
+  } finally {
+    await dbClient?.end();
   }
-
-  return res.status(405).end();
 }
