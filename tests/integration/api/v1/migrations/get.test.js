@@ -1,10 +1,14 @@
-import database from 'infra/database'
+import database from "infra/database";
+import { waitForAllServices } from "../orchestrator";
 
-async function cleanDatabase(){
-  await database.query("DROP SCHEMA public cascade; CREATE SCHEMA public;")
+async function cleanDatabase() {
+  await database.query("DROP SCHEMA public cascade; CREATE SCHEMA public;");
 }
 
-beforeAll(cleanDatabase);
+beforeAll(async () => {
+  await waitForAllServices();
+  await cleanDatabase();
+});
 
 test("GET to /api/v1/migrations should return status 200", async () => {
   const response = await fetch("http://localhost:3000/api/v1/migrations");
