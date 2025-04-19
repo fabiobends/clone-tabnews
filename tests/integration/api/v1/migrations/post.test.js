@@ -10,22 +10,33 @@ beforeAll(async () => {
   await cleanDatabase();
 });
 
-test("POST to /api/v1/migrations should return status 200", async () => {
-  const firstResponse = await fetch("http://localhost:3000/api/v1/migrations", {
-    method: "POST",
+describe("POST /api/v1/migrations", () => {
+  describe("Anonymous user", () => {
+    describe("Runs pending migrations", () => {
+      test("For the first time", async () => {
+        const response = await fetch(
+          "http://localhost:3000/api/v1/migrations",
+          {
+            method: "POST",
+          },
+        );
+        const pendingMigrations = await response.json();
+        expect(response.status).toEqual(201);
+        expect(Array.isArray(pendingMigrations)).toBe(true);
+        expect(pendingMigrations.length).toBeGreaterThan(0);
+      });
+      test("For the second time", async () => {
+        const response = await fetch(
+          "http://localhost:3000/api/v1/migrations",
+          {
+            method: "POST",
+          },
+        );
+        const pendingMigrations = await response.json();
+        expect(response.status).toEqual(200);
+        expect(Array.isArray(pendingMigrations)).toBe(true);
+        expect(pendingMigrations.length).toBe(0);
+      });
+    });
   });
-  const pendingMigrations = await firstResponse.json();
-  expect(firstResponse.status).toEqual(201);
-  expect(Array.isArray(pendingMigrations)).toBe(true);
-  expect(pendingMigrations.length).toBeGreaterThan(0);
-
-  const secondResponse = await fetch(
-    "http://localhost:3000/api/v1/migrations",
-    {
-      method: "POST",
-    },
-  );
-  const migratedMigrations = await secondResponse.json();
-  expect(secondResponse.status).toEqual(200);
-  expect(migratedMigrations.length).toEqual(0);
 });
