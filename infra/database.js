@@ -1,4 +1,6 @@
 import pg from "pg";
+import { ServiceError } from "infra/errors.js";
+
 const { Client } = pg;
 
 const getSSLOptions = () => {
@@ -11,16 +13,24 @@ const getSSLOptions = () => {
 };
 
 const getNewClient = async () => {
-  const client = new Client({
-    user: process.env.POSTGRES_USER,
-    host: process.env.POSTGRES_HOST,
-    database: process.env.POSTGRES_DB,
-    password: process.env.POSTGRES_PASSWORD,
-    port: process.env.POSTGRES_PORT,
-    ssl: getSSLOptions(),
-  });
-  await client.connect();
-  return client;
+  try {
+    const client = new Client({
+      user: process.env.POSTGRES_USER,
+      host: process.env.POSTGRES_HOST,
+      database: process.env.POSTGRES_DB,
+      password: process.env.POSTGRES_PASSWORD,
+      port: process.env.POSTGRES_PORT,
+      ssl: getSSLOptions(),
+    });
+    await client.connect();
+    return client;
+  } catch (error) {
+    const serviceErrorObject = new ServiceError({
+      message: "Database connection error",
+      cause: error,
+    });
+    throw serviceErrorObject;
+  }
 };
 
 const query = async (queryObject) => {
@@ -30,8 +40,11 @@ const query = async (queryObject) => {
     const res = await client.query(queryObject);
     return res;
   } catch (error) {
-    console.error(error);
-    throw error;
+    const serviceErrorObject = new ServiceError({
+      message: "Database connection error or query execution failed",
+      cause: error,
+    });
+    throw serviceErrorObject;
   } finally {
     await client?.end();
   }
