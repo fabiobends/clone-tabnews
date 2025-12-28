@@ -1,40 +1,24 @@
-import migrationRunner from "node-pg-migrate";
 import { createRouter } from "next-connect";
-import { resolve } from "node:path";
-import database from "infra/database";
 import controller from "infra/controller";
+import migrator from "models/migrator";
 
 const router = createRouter();
 
-const handler = ({ isDryRun = true }) =>
-  async function (req, res) {
-    let dbClient;
-    try {
-      dbClient = await database.getNewClient();
+async function getHandler(req, res) {
+  const pendingMigrations = await migrator.listPendingMigrations();
+  res.status(200).json(pendingMigrations);
+}
 
-      const defaultOptions = {
-        dbClient,
-        dir: resolve("infra", "migrations"),
-        verbose: true,
-        direction: "up",
-        migrationsTable: "pgmigrations",
-        dryRun: isDryRun,
-      };
+async function postHandler(req, res) {
+  const pendingMigrations = await migrator.runPendingMigrations();
 
-      const migrations = await migrationRunner(defaultOptions);
-      const hasNoMigrations = migrations.length === 0;
-      const statusCode = hasNoMigrations || isDryRun ? 200 : 201;
-      return res.status(statusCode).json(migrations);
-    } catch (error) {
-      console.error(error);
-      throw error;
-    } finally {
-      await dbClient?.end();
-    }
-  };
+  if (pendingMigrations.length === 0) {
+    res.status(200).json(pendingMigrations);
+    return;
+  }
 
-const getHandler = handler({ isDryRun: true });
-const postHandler = handler({ isDryRun: false });
+  res.status(201).json(pendingMigrations);
+}
 
 router.get(getHandler);
 router.post(postHandler);
