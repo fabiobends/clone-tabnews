@@ -1,36 +1,42 @@
 import migrationRunner from "node-pg-migrate";
+import { createRouter } from "next-connect";
 import { resolve } from "node:path";
 import database from "infra/database";
+import controller from "infra/controller";
 
-export default async function handler(req, res) {
-  if (req.method !== "GET" && req.method !== "POST") {
-    return res.status(405).json({
-      message: "Method not allowed",
-    });
-  }
+const router = createRouter();
 
-  let dbClient;
-  try {
-    dbClient = await database.getNewClient();
-    const dryRun = req.method === "GET";
+const handler = ({ isDryRun = true }) =>
+  async function (req, res) {
+    let dbClient;
+    try {
+      dbClient = await database.getNewClient();
 
-    const defaultOptions = {
-      dbClient,
-      dir: resolve("infra", "migrations"),
-      verbose: true,
-      direction: "up",
-      migrationsTable: "pgmigrations",
-      dryRun,
-    };
+      const defaultOptions = {
+        dbClient,
+        dir: resolve("infra", "migrations"),
+        verbose: true,
+        direction: "up",
+        migrationsTable: "pgmigrations",
+        dryRun: isDryRun,
+      };
 
-    const migrations = await migrationRunner(defaultOptions);
-    const hasNoMigrations = migrations.length === 0;
-    const statusCode = hasNoMigrations || dryRun ? 200 : 201;
-    return res.status(statusCode).json(migrations);
-  } catch (error) {
-    console.error(error);
-    throw error;
-  } finally {
-    await dbClient?.end();
-  }
-}
+      const migrations = await migrationRunner(defaultOptions);
+      const hasNoMigrations = migrations.length === 0;
+      const statusCode = hasNoMigrations || isDryRun ? 200 : 201;
+      return res.status(statusCode).json(migrations);
+    } catch (error) {
+      console.error(error);
+      throw error;
+    } finally {
+      await dbClient?.end();
+    }
+  };
+
+const getHandler = handler({ isDryRun: true });
+const postHandler = handler({ isDryRun: false });
+
+router.get(getHandler);
+router.post(postHandler);
+
+export default router.handler(controller.errorHandlers);
