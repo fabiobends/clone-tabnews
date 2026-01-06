@@ -17,6 +17,25 @@ export class InternalServerError extends Error {
   }
 }
 
+export class NotFoundError extends Error {
+  constructor({ message, action }) {
+    super(message || "Resource not found");
+    this.name = "NotFoundError";
+    this.statusCode = 404;
+    this.action =
+      action || "Please check the resource identifier and try again";
+  }
+
+  toJSON() {
+    return {
+      name: this.name,
+      message: this.message,
+      status_code: this.statusCode,
+      action: this.action,
+    };
+  }
+}
+
 export class ServiceError extends Error {
   constructor({ cause, message }) {
     super(message || "Service unavailable", { cause });
