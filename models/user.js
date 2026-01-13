@@ -1,5 +1,6 @@
-import { ValidationError, NotFoundError } from "@/infra/errors";
+import { ValidationError, NotFoundError } from "infra/errors";
 import database from "infra/database";
+import password from "models/password";
 
 async function create(userValues) {
   async function valideteEmailUniqueness(email) {
@@ -59,8 +60,14 @@ async function create(userValues) {
     return result.rows[0];
   }
 
+  async function hashPasswordInObject(userValues) {
+    const hashedPassword = await password.hash(userValues.password);
+    userValues.password = hashedPassword;
+  }
+
   await valideteEmailUniqueness(userValues.email);
   await validateUsernameUniqueness(userValues.username);
+  await hashPasswordInObject(userValues);
   const newUser = await runInsertQuery();
   return newUser;
 }
