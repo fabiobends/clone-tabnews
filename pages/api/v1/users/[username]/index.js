@@ -10,6 +10,13 @@ async function getHandler(req, res) {
   res.status(200).json(userFound);
 }
 
+async function patchHandler(req, res) {
+  const { username } = req.query;
+  const updatedUser = await user.updateByUsername(username, req.body);
+  res.status(200).json(updatedUser);
+}
+
 router.get(getHandler);
+router.patch(patchHandler);
 
 export default router.handler(controller.errorHandlers);
