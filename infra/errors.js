@@ -36,6 +36,24 @@ export class NotFoundError extends Error {
   }
 }
 
+export class UnauthorizedError extends Error {
+  constructor({ message, action }) {
+    super(message || "Unauthorized");
+    this.name = "UnauthorizedError";
+    this.statusCode = 401;
+    this.action = action || "Please check your credentials and try again";
+  }
+
+  toJSON() {
+    return {
+      name: this.name,
+      message: this.message,
+      status_code: this.statusCode,
+      action: this.action,
+    };
+  }
+}
+
 export class ServiceError extends Error {
   constructor({ cause, message }) {
     super(message || "Service unavailable", { cause });
