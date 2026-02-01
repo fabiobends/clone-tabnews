@@ -20,6 +20,17 @@ async function postHandler(req, res) {
   res.status(201).json(newSession);
 }
 
+async function deleteHandler(req, res) {
+  const sessionToken = req.cookies.session_id;
+  const existingSession =
+    await session.findOneValidSessionByToken(sessionToken);
+  const expiredSession = await session.expireById(existingSession.id);
+
+  controller.clearSessionCookie(res);
+  res.status(200).json(expiredSession);
+}
+
+router.delete(deleteHandler);
 router.post(postHandler);
 
 export default router.handler(controller.errorHandlers);
