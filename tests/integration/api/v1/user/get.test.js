@@ -1,5 +1,5 @@
 import { version as uuidVersion } from "uuid";
-import orchestrator from "../orchestrator";
+import orchestrator from "../../../../orchestrator";
 import session from "models/session";
 import setCookieParser from "set-cookie-parser";
 
