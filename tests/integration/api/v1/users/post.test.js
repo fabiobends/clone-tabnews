@@ -31,6 +31,7 @@ describe("POST /api/v1/users", () => {
         id: expect.any(String),
         username: "userpost1",
         email: "userpost1@example.com",
+        features: [],
         password: expect.any(String),
         created_at: expect.any(String),
         updated_at: expect.any(String),
