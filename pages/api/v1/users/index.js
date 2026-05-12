@@ -15,6 +15,7 @@ async function postHandler(req, res) {
   res.status(201).json(newUser);
 }
 
-router.post(postHandler);
+router.post(controller.injectAnonymousOrUser);
+router.post(controller.canRequest("create:user"), postHandler);
 
 export default router.handler(controller.errorHandlers);
