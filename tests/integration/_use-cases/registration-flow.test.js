@@ -60,12 +60,15 @@ describe("Use case: Registration Flow (all successful)", () => {
   });
 
   test("Activate account", async () => {
-    const response = await fetch(`${webserver.origin}/api/v1/activations/${activationTokenId}`, {
-      method: "PATCH",
-    });
+    const response = await fetch(
+      `${webserver.origin}/api/v1/activations/${activationTokenId}`,
+      {
+        method: "PATCH",
+      },
+    );
 
     expect(response.status).toBe(200);
-    
+
     const responseBody = await response.json();
     expect(Date.parse(responseBody.used_at)).not.toBeNaN();
 
@@ -73,7 +76,24 @@ describe("Use case: Registration Flow (all successful)", () => {
     expect(activatedUser.features).toEqual(["create:session"]);
   });
 
-  test("Login", async () => {});
+  test("Login", async () => {
+    const response = await fetch(`${webserver.origin}/api/v1/sessions`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email: createdUser.email,
+        password: "registrationflowpassword",
+      }),
+    });
+
+    expect(response.status).toBe(201);
+
+    const responseBody = await response.json();
+
+    expect(responseBody.user_id).toBe(createdUser.id);
+  });
 
   test("Get user information", async () => {});
 });

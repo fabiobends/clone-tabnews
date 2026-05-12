@@ -54,6 +54,24 @@ export class UnauthorizedError extends Error {
   }
 }
 
+export class ForbiddenError extends Error {
+  constructor({ message, action }) {
+    super(message || "Denied access");
+    this.name = "ForbiddenError";
+    this.statusCode = 403;
+    this.action = action || "Verify features required for this action and try again";
+  }
+
+  toJSON() {
+    return {
+      name: this.name,
+      message: this.message,
+      status_code: this.statusCode,
+      action: this.action,
+    };
+  }
+}
+
 export class ServiceError extends Error {
   constructor({ cause, message }) {
     super(message || "Service unavailable", { cause });
