@@ -23,6 +23,25 @@ async function validateUsernameUniqueness(username) {
   }
 }
 
+async function setFeatures(userId, features) {
+  const result = await database.query({
+    text: `
+      UPDATE
+        users
+      SET
+        features = $2,
+        updated_at = timezone('utc', now())
+      WHERE
+        id = $1
+      RETURNING
+        *
+    `,
+    values: [userId, features],
+  });
+
+  return result.rows[0];
+}
+
 async function validateEmailUniqueness(email) {
   const results = await database.query({
     text: `
@@ -230,6 +249,7 @@ const user = {
   findOneByUsername,
   findOneByEmail,
   updateByUsername,
+  setFeatures,
 };
 
 export default user;
