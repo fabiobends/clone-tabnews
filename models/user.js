@@ -42,6 +42,25 @@ async function setFeatures(userId, features) {
   return result.rows[0];
 }
 
+async function addFeatures(userId, featuresToAdd) {
+  const results = await database.query({
+    text: `
+      UPDATE
+        users
+      SET
+        features = array_cat($2, features),
+        updated_at = timezone('utc', now())
+      WHERE
+        id = $1
+      RETURNING
+        *
+    `,
+    values: [userId, featuresToAdd],
+  });
+
+  return results.rows[0];
+}
+
 async function validateEmailUniqueness(email) {
   const results = await database.query({
     text: `
@@ -250,6 +269,7 @@ const user = {
   findOneByEmail,
   updateByUsername,
   setFeatures,
+  addFeatures,
 };
 
 export default user;
