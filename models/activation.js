@@ -47,7 +47,7 @@ async function markTokenAsUsed(tokenId) {
 }
 
 async function activateUserByUserId(userId) {
-  return await user.setFeatures(userId, ["create:session"]);
+  return await user.setFeatures(userId, ["create:session", "read:session"]);
 }
 
 async function findOneValidById(id) {
