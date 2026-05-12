@@ -9,6 +9,7 @@ import {
   ValidationError,
   ForbiddenError,
 } from "infra/errors";
+import authorization from "@/models/authorization";
 
 function onErrorHandler(err, req, res) {
   if (err instanceof ValidationError || err instanceof NotFoundError || err instanceof ForbiddenError) {
@@ -87,15 +88,15 @@ function injectAnonymousUser(req) {
 
 function canRequest(feature) {
   return function canRequestMiddleware(req, res, next) {
-    const userFeatures = req.context.user.features;
+    const { user } = req.context;
 
-    if (userFeatures.includes(feature)) {
+    if (authorization.can(user, feature)) {
       return next();
     }
 
     throw new ForbiddenError({
       message: "You don't have permission to execute this action",
-      actionn: `Verify if your account owns this action: ${feature}`,
+      action: `Verify if your account owns this action: ${feature}`,
     });
   };
 }
