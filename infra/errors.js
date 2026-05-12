@@ -59,7 +59,8 @@ export class ForbiddenError extends Error {
     super(message || "Denied access");
     this.name = "ForbiddenError";
     this.statusCode = 403;
-    this.action = action || "Verify features required for this action and try again";
+    this.action =
+      action || "Verify features required for this action and try again";
   }
 
   toJSON() {

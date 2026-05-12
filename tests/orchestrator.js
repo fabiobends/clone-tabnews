@@ -107,8 +107,8 @@ const extractUUID = (text) => {
 };
 
 const activateUser = async (user) => {
-  return await activation.activateUserByUserId(user.id)
-}
+  return await activation.activateUserByUserId(user.id);
+};
 
 const orchestrator = {
   waitForAllServices,
