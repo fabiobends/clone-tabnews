@@ -16,6 +16,8 @@ describe("GET /api/v1/user", () => {
         username: "UserWithValidSession",
       });
 
+      const activatedUser = await orchestrator.activateUser(user);
+
       const sessionCreated = await orchestrator.createSession(user.id);
 
       const response = await fetch("http://localhost:3000/api/v1/user", {
@@ -36,10 +38,10 @@ describe("GET /api/v1/user", () => {
         id: expect.any(String),
         username: "UserWithValidSession",
         email: user.email,
-        features: ["read:activation_token"],
+        features: ["create:session", "read:session"],
         password: user.password,
         created_at: user.created_at.toISOString(),
-        updated_at: user.updated_at.toISOString(),
+        updated_at: activatedUser.updated_at.toISOString(),
       });
 
       expect(uuidVersion(responseData.id)).toBe(4);
@@ -148,6 +150,8 @@ describe("GET /api/v1/user", () => {
         username: "UserWithAlmostExpiredSession",
       });
 
+      const activatedUser = await orchestrator.activateUser(user);
+
       const sessionCreated = await orchestrator.createSession(user.id);
 
       jest.useRealTimers();
@@ -164,10 +168,10 @@ describe("GET /api/v1/user", () => {
         id: expect.any(String),
         username: "UserWithAlmostExpiredSession",
         email: user.email,
-        features: ["read:activation_token"],
+        features: ["create:session", "read:session"],
         password: user.password,
         created_at: user.created_at.toISOString(),
-        updated_at: user.updated_at.toISOString(),
+        updated_at: activatedUser.updated_at.toISOString(),
       });
 
       expect(uuidVersion(responseData.id)).toBe(4);
@@ -180,6 +184,21 @@ describe("GET /api/v1/user", () => {
       );
       expect(renewedSession.expires_at > sessionCreated.expires_at).toBe(true);
       expect(renewedSession.updated_at > sessionCreated.updated_at).toBe(true);
+    });
+  });
+
+  describe("Anonymous user", () => {
+    test("Retrieving the endpoint", async () => {
+      const response = await fetch("http://localhost:3000/api/v1/user");
+
+      expect(response.status).toEqual(403);
+      const responseData = await response.json();
+      expect(responseData).toEqual({
+        action: "Verify if your account owns this action: read:session",
+        message: "You don't have permission to execute this action",
+        name: "ForbiddenError",
+        status_code: 403,
+      });
     });
   });
 });
