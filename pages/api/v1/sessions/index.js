@@ -30,7 +30,8 @@ async function deleteHandler(req, res) {
   res.status(200).json(expiredSession);
 }
 
+router.use(controller.injestAnonymousOrUser);
 router.delete(deleteHandler);
-router.post(postHandler);
+router.post(controller.canRequest("create:session"), postHandler);
 
 export default router.handler(controller.errorHandlers);
