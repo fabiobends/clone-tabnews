@@ -1,13 +1,13 @@
-function getOrigin(){
+function getOrigin() {
   if (["test", "development"].includes(process.env.NODE_ENV)) {
     return "http://localhost:3000";
   }
 
-  if (process.env.VERCEL_ENV === "preview"){
+  if (process.env.VERCEL_ENV === "preview") {
     return `https://${process.env.VERCEL_URL}`;
   }
 
-  return "https://chiquitita.com.br"
+  return "https://chiquitita.com.br";
 }
 
 const webserver = {

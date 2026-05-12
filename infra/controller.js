@@ -12,7 +12,11 @@ import {
 import authorization from "@/models/authorization";
 
 function onErrorHandler(err, req, res) {
-  if (err instanceof ValidationError || err instanceof NotFoundError || err instanceof ForbiddenError) {
+  if (
+    err instanceof ValidationError ||
+    err instanceof NotFoundError ||
+    err instanceof ForbiddenError
+  ) {
     return res.status(err.statusCode).json(err);
   }
 
