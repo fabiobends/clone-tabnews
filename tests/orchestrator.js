@@ -82,6 +82,10 @@ const getLastEmail = async () => {
     const emails = await response.json();
     const lastEmail = emails.pop();
 
+    if (!lastEmail) {
+      return null;
+    }
+
     const emailDetailsResponse = await fetch(
       `${emailHttpUrl}/messages/${lastEmail.id}.plain`,
     );
@@ -96,6 +100,11 @@ const getLastEmail = async () => {
   }
 };
 
+const extractUUID = (text) => {
+  const match = text.match(/[0-9a-fA-F-]{36}/);
+  return match ? match[0] : null;
+};
+
 const orchestrator = {
   waitForAllServices,
   clearDatabase,
@@ -104,6 +113,7 @@ const orchestrator = {
   createSession,
   deleteAllEmails,
   getLastEmail,
+  extractUUID,
 };
 
 export default orchestrator;
