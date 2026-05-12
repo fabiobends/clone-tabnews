@@ -56,7 +56,11 @@ async function activateUserByUserId(userId) {
       message: "You do not have permission to activate this user.",
     });
   }
-  return await user.setFeatures(userId, ["create:session", "read:session"]);
+  return await user.setFeatures(userId, [
+    "create:session",
+    "read:session",
+    "update:user",
+  ]);
 }
 
 async function findOneValidById(id) {
