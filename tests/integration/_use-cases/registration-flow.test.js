@@ -98,12 +98,15 @@ describe("Use case: Registration Flow (all successful)", () => {
   });
 
   test("Get user information", async () => {
-    const response = await fetch(`${webserver.origin}/api/v1/users/${createdUser.username}`, {
-      headers: {
-        "Content-Type": "application/json",
-        cookie: `session_id=${createdSession.token}`
+    const response = await fetch(
+      `${webserver.origin}/api/v1/users/${createdUser.username}`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          cookie: `session_id=${createdSession.token}`,
+        },
       },
-    });
+    );
 
     expect(response.status).toBe(200);
 

@@ -7,12 +7,14 @@ const router = createRouter();
 async function patchHandler(req, res) {
   const activationTokenId = req.query.token_id;
   const validToken = await activation.findOneValidById(activationTokenId);
-  const userActivationToken = await activation.markTokenAsUsed(activationTokenId);
-
   await activation.activateUserByUserId(validToken.user_id);
+  const userActivationToken =
+    await activation.markTokenAsUsed(activationTokenId);
+
   res.status(200).json(userActivationToken);
 }
 
-router.patch(patchHandler);
+router.use(controller.injectAnonymousOrUser);
+router.patch(controller.canRequest("read:activation_token"), patchHandler);
 
 export default router.handler(controller.errorHandlers);
