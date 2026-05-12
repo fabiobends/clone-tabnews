@@ -2,6 +2,8 @@ import database from "infra/database";
 import email from "infra/email";
 import webserver from "infra/webserver";
 import user from "models/user";
+import authorization from "models/authorization";
+import { ForbiddenError, NotFoundError } from "infra/errors";
 
 const EXPIRATION_IN_MILLISECONDS = 60 * 15 * 1000; // 15 minutes
 
@@ -47,6 +49,13 @@ async function markTokenAsUsed(tokenId) {
 }
 
 async function activateUserByUserId(userId) {
+  const userToActivate = await user.findOneById(userId);
+  if (!authorization.can(userToActivate, "read:activation_token")) {
+    throw new ForbiddenError({
+      action: "Contact support if you believe this is an error.",
+      message: "You do not have permission to activate this user.",
+    });
+  }
   return await user.setFeatures(userId, ["create:session", "read:session"]);
 }
 
@@ -63,6 +72,13 @@ async function findOneValidById(id) {
     `,
     values: [id],
   });
+
+  if (!result.rows[0]) {
+    throw new NotFoundError({
+      message: "Activation token not found or invalid",
+      action: "Verify if the token is correct or contact support",
+    });
+  }
 
   return result.rows[0];
 }
@@ -88,6 +104,7 @@ const activation = {
   sendEmailToUser,
   markTokenAsUsed,
   activateUserByUserId,
+  EXPIRATION_IN_MILLISECONDS,
 };
 
 export default activation;
