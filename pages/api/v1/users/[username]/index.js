@@ -16,7 +16,8 @@ async function patchHandler(req, res) {
   res.status(200).json(updatedUser);
 }
 
+router.use(controller.injectAnonymousOrUser);
 router.get(getHandler);
-router.patch(patchHandler);
+router.patch(controller.canRequest("update:user"), patchHandler);
 
 export default router.handler(controller.errorHandlers);
