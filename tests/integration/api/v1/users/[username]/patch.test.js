@@ -140,6 +140,43 @@ describe("PATCH /api/v1/users/[username]", () => {
       });
     });
 
+    test("With userB targeting userA", async () => {
+      const userA = await orchestrator.createUser({
+        username: "userA",
+      });
+
+      const userB = await orchestrator.createUser({
+        username: "userB",
+      });
+
+      const userBActivated = await orchestrator.activateUser(userB);
+      const userBSession = await orchestrator.createSession(userBActivated.id);
+
+      const response = await fetch(
+        `http://localhost:3000/api/v1/users/${userA.username}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            cookie: `session_id=${userBSession.token}`,
+          },
+          body: JSON.stringify({
+            username: "userC",
+          }),
+        },
+      );
+
+      expect(response.status).toEqual(403);
+
+      const responseData = await response.json();
+      expect(responseData).toEqual({
+        action: "Verify if you own the feature to update others users.",
+        message: "You do not have permission to update this user.",
+        name: "ForbiddenError",
+        status_code: 403,
+      });
+    });
+
     test("With unique username", async () => {
       const user = await orchestrator.createUser({
         username: "useruniquy1",
