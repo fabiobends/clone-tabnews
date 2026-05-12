@@ -1,4 +1,6 @@
 import orchestrator from "../../orchestrator";
+import webserver from "infra/webserver";
+import activation from "models/activation";
 
 beforeAll(async () => {
   await orchestrator.waitForAllServices();
@@ -8,6 +10,7 @@ beforeAll(async () => {
 });
 
 describe("Use case: Registration Flow (all successful)", () => {
+  let createdUser;
   test("Create user account", async () => {
     const response = await fetch("http://localhost:3000/api/v1/users", {
       method: "POST",
@@ -15,7 +18,7 @@ describe("Use case: Registration Flow (all successful)", () => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        username: "RegisttrationFlow",
+        username: "RegistrationFlow",
         email: "registration.flow@example.com",
         password: "registrationflowpassword",
       }),
@@ -23,10 +26,10 @@ describe("Use case: Registration Flow (all successful)", () => {
 
     expect(response.status).toEqual(201);
 
-    const responseData = await response.json();
-    expect(responseData).toEqual({
+    createdUser = await response.json();
+    expect(createdUser).toEqual({
       id: expect.any(String),
-      username: "RegisttrationFlow",
+      username: "RegistrationFlow",
       email: "registration.flow@example.com",
       features: ["read:activation_token"],
       password: expect.any(String),
@@ -35,7 +38,24 @@ describe("Use case: Registration Flow (all successful)", () => {
     });
   });
 
-  test("Receive activation email", async () => {});
+  test("Receive activation email", async () => {
+    const lastEmail = await orchestrator.getLastEmail();
+
+    expect(lastEmail.sender).toBe("<contact@example.com>");
+    expect(lastEmail.recipients[0]).toBe("<registration.flow@example.com>");
+    expect(lastEmail.subject).toBe("Activate your account");
+    expect(lastEmail.text).toContain("RegistrationFlow");
+
+    const token = orchestrator.extractUUID(lastEmail.text);
+
+    expect(lastEmail.text).toContain(
+      `${webserver.origin}/register/activate/${token}`,
+    );
+
+    const validToken = await activation.findOneValidById(token);
+
+    expect(validToken.user_id).toBe(createdUser.id);
+  });
 
   test("Activate account", async () => {});
 
