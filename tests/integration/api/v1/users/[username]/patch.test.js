@@ -205,9 +205,7 @@ describe("PATCH /api/v1/users/[username]", () => {
       expect(responseData).toEqual({
         id: expect.any(String),
         username: "useruniquy2",
-        email: user.email,
         features: ["create:session", "read:session", "update:user"],
-        password: expect.any(String),
         created_at: expect.any(String),
         updated_at: expect.any(String),
       });
@@ -246,9 +244,7 @@ describe("PATCH /api/v1/users/[username]", () => {
       expect(responseData).toEqual({
         id: expect.any(String),
         username: user.username,
-        email: "uniqueemail2@example.com",
         features: ["create:session", "read:session", "update:user"],
-        password: expect.any(String),
         created_at: expect.any(String),
         updated_at: expect.any(String),
       });
@@ -287,9 +283,7 @@ describe("PATCH /api/v1/users/[username]", () => {
       expect(responseData).toEqual({
         id: expect.any(String),
         username: userCreated.username,
-        email: userCreated.email,
         features: ["create:session", "read:session", "update:user"],
-        password: expect.any(String),
         created_at: expect.any(String),
         updated_at: expect.any(String),
       });
@@ -347,9 +341,7 @@ describe("PATCH /api/v1/users/[username]", () => {
       expect(responseData).toEqual({
         id: anotherUser.id,
         username: "alteredByPrivilegedUser",
-        email: anotherUser.email,
         features: anotherUser.features,
-        password: expect.any(String),
         created_at: expect.any(String),
         updated_at: expect.any(String),
       });
