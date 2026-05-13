@@ -16,7 +16,7 @@ describe("Use case: Registration Flow (all successful)", () => {
   let createdSession;
 
   test("Create user account", async () => {
-    const response = await fetch("http://localhost:3000/api/v1/users", {
+    const response = await fetch(`${webserver.origin}/api/v1/users`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

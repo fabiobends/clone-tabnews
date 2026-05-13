@@ -1,4 +1,5 @@
 import orchestrator from "../../../../../orchestrator";
+import webserver from "infra/webserver";
 
 beforeAll(async () => {
   await orchestrator.waitForAllServices();
@@ -10,7 +11,7 @@ describe("GET /api/v1/activations/[token_id]", () => {
   describe("Anonymous user", () => {
     test("With any token", async () => {
       const response = await fetch(
-        "http://localhost:3000/api/v1/activations/sometoken",
+        `${webserver.origin}/api/v1/activations/sometoken`,
       );
 
       expect(response.status).toEqual(405);
@@ -32,7 +33,7 @@ describe("GET /api/v1/activations/[token_id]", () => {
       const userSession = await orchestrator.createSession(createdUser.id);
 
       const response = await fetch(
-        "http://localhost:3000/api/v1/activations/sometoken",
+        `${webserver.origin}/api/v1/activations/sometoken`,
         {
           headers: {
             Cookie: `session_id=${userSession.token}`,

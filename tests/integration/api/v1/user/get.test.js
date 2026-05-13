@@ -2,6 +2,7 @@ import { version as uuidVersion } from "uuid";
 import orchestrator from "../../../../orchestrator";
 import session from "models/session";
 import setCookieParser from "set-cookie-parser";
+import webserver from "infra/webserver";
 
 beforeAll(async () => {
   await orchestrator.waitForAllServices();
@@ -20,7 +21,7 @@ describe("GET /api/v1/user", () => {
 
       const sessionCreated = await orchestrator.createSession(user.id);
 
-      const response = await fetch("http://localhost:3000/api/v1/user", {
+      const response = await fetch(`${webserver.origin}/api/v1/user`, {
         headers: {
           Cookie: `session_id=${sessionCreated.token}`,
         },
@@ -69,7 +70,7 @@ describe("GET /api/v1/user", () => {
       const nonexistentToken =
         "438e105ea82f899ed5c9d3bca8a0ac38fbc5197df48c17850f71c781ec74c714a973e3c99802c24efa2a598820fff55b";
 
-      const response = await fetch("http://localhost:3000/api/v1/user", {
+      const response = await fetch(`${webserver.origin}/api/v1/user`, {
         headers: {
           Cookie: `session_id=${nonexistentToken}`,
         },
@@ -111,7 +112,7 @@ describe("GET /api/v1/user", () => {
 
       jest.useRealTimers();
 
-      const response = await fetch("http://localhost:3000/api/v1/user", {
+      const response = await fetch(`${webserver.origin}/api/v1/user`, {
         headers: {
           Cookie: `session_id=${sessionCreated.token}`,
         },
@@ -155,7 +156,7 @@ describe("GET /api/v1/user", () => {
 
       jest.useRealTimers();
 
-      const response = await fetch("http://localhost:3000/api/v1/user", {
+      const response = await fetch(`${webserver.origin}/api/v1/user`, {
         headers: {
           Cookie: `session_id=${sessionCreated.token}`,
         },
@@ -187,7 +188,7 @@ describe("GET /api/v1/user", () => {
 
   describe("Anonymous user", () => {
     test("Retrieving the endpoint", async () => {
-      const response = await fetch("http://localhost:3000/api/v1/user");
+      const response = await fetch(`${webserver.origin}/api/v1/user`);
 
       expect(response.status).toEqual(403);
       const responseData = await response.json();

@@ -5,6 +5,7 @@ import migrator from "models/migrator";
 import session from "models/session";
 import activation from "models/activation";
 import user from "models/user";
+import webserver from "infra/webserver";
 
 const emailHttpUrl = `http://${process.env.EMAIL_HTTP_HOST}:${process.env.EMAIL_HTTP_PORT}`;
 
@@ -15,7 +16,7 @@ const waitForAllServices = async () => {
   async function waitForWebServer() {
     await retry(
       async () => {
-        const response = await fetch("http://localhost:3000/api/v1/status");
+        const response = await fetch(`${webserver.origin}/api/v1/status`);
         if (!response.ok) {
           throw new Error("Web server is not ready");
         }
