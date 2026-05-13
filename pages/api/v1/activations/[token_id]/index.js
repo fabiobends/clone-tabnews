@@ -1,6 +1,7 @@
 import { createRouter } from "next-connect";
 import controller from "infra/controller";
 import activation from "models/activation";
+import authorization from "models/authorization";
 
 const router = createRouter();
 
@@ -11,7 +12,12 @@ async function patchHandler(req, res) {
   const userActivationToken =
     await activation.markTokenAsUsed(activationTokenId);
 
-  res.status(200).json(userActivationToken);
+  const secureOutput = authorization.filterOutput(
+    req.context.user,
+    "read:activation_token",
+    userActivationToken,
+  );
+  res.status(200).json(secureOutput);
 }
 
 router.use(controller.injectAnonymousOrUser);

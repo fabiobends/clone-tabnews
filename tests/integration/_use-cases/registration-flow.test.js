@@ -34,9 +34,7 @@ describe("Use case: Registration Flow (all successful)", () => {
     expect(createdUser).toEqual({
       id: expect.any(String),
       username: "RegistrationFlow",
-      email: "registration.flow@example.com",
       features: ["read:activation_token"],
-      password: expect.any(String),
       created_at: expect.any(String),
       updated_at: expect.any(String),
     });
@@ -89,7 +87,7 @@ describe("Use case: Registration Flow (all successful)", () => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        email: createdUser.email,
+        email: "registration.flow@example.com",
         password: "registrationflowpassword",
       }),
     });

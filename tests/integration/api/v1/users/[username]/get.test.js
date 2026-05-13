@@ -25,9 +25,7 @@ describe("GET /api/v1/users/[username]", () => {
       expect(response2Data).toEqual({
         id: expect.any(String),
         username: "SameCase",
-        email: "SameCase@example.com",
         features: ["read:activation_token"],
-        password: expect.any(String),
         created_at: expect.any(String),
         updated_at: expect.any(String),
       });
@@ -53,9 +51,7 @@ describe("GET /api/v1/users/[username]", () => {
       expect(response2Data).toEqual({
         id: expect.any(String),
         username: "diferentcase",
-        email: "diferentcase@example.com",
         features: ["read:activation_token"],
-        password: expect.any(String),
         created_at: expect.any(String),
         updated_at: expect.any(String),
       });

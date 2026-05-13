@@ -30,9 +30,7 @@ describe("POST /api/v1/users", () => {
       expect(responseData).toEqual({
         id: expect.any(String),
         username: "userpost1",
-        email: "userpost1@example.com",
         features: ["read:activation_token"],
-        password: expect.any(String),
         created_at: expect.any(String),
         updated_at: expect.any(String),
       });

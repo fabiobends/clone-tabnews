@@ -9,7 +9,13 @@ const router = createRouter();
 async function getHandler(req, res) {
   const { username } = req.query;
   const userFound = await user.findOneByUsername(username);
-  res.status(200).json(userFound);
+
+  const secureOutput = authorization.filterOutput(
+    req.context.user,
+    "read:user",
+    userFound,
+  );
+  res.status(200).json(secureOutput);
 }
 
 async function patchHandler(req, res) {
@@ -25,7 +31,12 @@ async function patchHandler(req, res) {
   }
 
   const updatedUser = await user.updateByUsername(username, req.body);
-  res.status(200).json(updatedUser);
+  const secureOutput = authorization.filterOutput(
+    req.context.user,
+    "read:user",
+    updatedUser,
+  );
+  res.status(200).json(secureOutput);
 }
 
 router.use(controller.injectAnonymousOrUser);
