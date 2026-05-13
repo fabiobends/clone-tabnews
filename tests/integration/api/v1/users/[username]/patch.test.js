@@ -218,15 +218,15 @@ describe("PATCH /api/v1/users/[username]", () => {
     });
 
     test("With unique email", async () => {
-      const user = await orchestrator.createUser({
+      const createdUser = await orchestrator.createUser({
         email: "uniqueemail1@example.com",
       });
 
-      const userActivated = await orchestrator.activateUser(user);
+      const userActivated = await orchestrator.activateUser(createdUser);
       const userSession = await orchestrator.createSession(userActivated.id);
 
       const response = await fetch(
-        `${webserver.origin}/api/v1/users/${user.username}`,
+        `${webserver.origin}/api/v1/users/${createdUser.username}`,
         {
           method: "PATCH",
           headers: {
@@ -244,7 +244,7 @@ describe("PATCH /api/v1/users/[username]", () => {
 
       expect(responseData).toEqual({
         id: expect.any(String),
-        username: user.username,
+        username: createdUser.username,
         features: ["create:session", "read:session", "update:user"],
         created_at: expect.any(String),
         updated_at: expect.any(String),
@@ -254,6 +254,9 @@ describe("PATCH /api/v1/users/[username]", () => {
       expect(Date.parse(responseData.created_at)).not.toBeNaN();
       expect(Date.parse(responseData.updated_at)).not.toBeNaN();
       expect(responseData.updated_at > responseData.created_at).toBe(true);
+
+      const userInDatabase = await user.findOneByUsername(createdUser.username);
+      expect(userInDatabase.email).toBe("uniqueemail2@example.com");
     });
 
     test("With new password", async () => {
