@@ -64,8 +64,8 @@ const createUser = async (userValues) => {
   });
 };
 
-const createSession = async (userId) => {
-  return await session.create(userId);
+const createSession = async (user) => {
+  return await session.create(user.id);
 };
 
 const deleteAllEmails = async () => {

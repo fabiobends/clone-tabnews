@@ -30,7 +30,7 @@ describe("GET /api/v1/activations/[token_id]", () => {
     test("With valid session", async () => {
       const createdUser = await orchestrator.createUser({});
       await orchestrator.activateUser(createdUser);
-      const userSession = await orchestrator.createSession(createdUser.id);
+      const userSession = await orchestrator.createSession(createdUser);
 
       const response = await fetch(
         `${webserver.origin}/api/v1/activations/sometoken`,

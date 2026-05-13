@@ -25,7 +25,7 @@ describe("GET /api/v1/status", () => {
     test("Retrieves current sytem status", async () => {
       const user = await orchestrator.createUser({});
       await orchestrator.activateUser(user);
-      const session = await orchestrator.createSession(user.id);
+      const session = await orchestrator.createSession(user);
       const response = await fetch(`${webserver.origin}/api/v1/status`, {
         headers: {
           cookie: `session_id=${session.token}`,
@@ -47,7 +47,7 @@ describe("GET /api/v1/status", () => {
       const user = await orchestrator.createUser({});
       await orchestrator.activateUser(user);
       await orchestrator.addFeaturesToUser(user, ["read:status"]);
-      const session = await orchestrator.createSession(user.id);
+      const session = await orchestrator.createSession(user);
       const response = await fetch(`${webserver.origin}/api/v1/status`, {
         headers: {
           cookie: `session_id=${session.token}`,
@@ -67,7 +67,7 @@ describe("GET /api/v1/status", () => {
       const user = await orchestrator.createUser({});
       await orchestrator.activateUser(user);
       await orchestrator.addFeaturesToUser(user, ["read:status:all"]);
-      const session = await orchestrator.createSession(user.id);
+      const session = await orchestrator.createSession(user);
       const response = await fetch(`${webserver.origin}/api/v1/status`, {
         headers: {
           cookie: `session_id=${session.token}`,
