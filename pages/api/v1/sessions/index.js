@@ -10,7 +10,7 @@ const router = createRouter();
 async function postHandler(req, res) {
   const userValues = req.body;
 
-  const authenticatedUser = await authentication.getAuthenticatedUser(
+  const authenticatedUser = await authentication.getUser(
     userValues.email,
     userValues.password,
   );
