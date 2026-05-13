@@ -4,8 +4,6 @@ import user from "models/user";
 import activation from "models/activation";
 import authorization from "@/models/authorization";
 
-const router = createRouter();
-
 async function postHandler(req, res) {
   const userValues = req.body;
   const newUser = await user.create(userValues);
@@ -21,7 +19,7 @@ async function postHandler(req, res) {
   res.status(201).json(secureOutput);
 }
 
-router.post(controller.injectAnonymousOrUser);
-router.post(controller.canRequest("create:user"), postHandler);
-
-export default router.handler(controller.errorHandlers);
+export default createRouter()
+  .use(controller.injectAnonymousOrUser)
+  .post(controller.canRequest("create:user"), postHandler)
+  .handler(controller.errorHandlers);
