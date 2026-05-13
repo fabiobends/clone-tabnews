@@ -89,7 +89,7 @@ async function findOneValidById(id) {
 
 async function sendEmailToUser(user, activationToken) {
   await email.send({
-    from: "Clone TabNews <contact@example.com>",
+    from: "Clone TabNews <contact@chiquitita.com.br>",
     to: user.email,
     subject: "Activate your account",
     text: `${user.username},
