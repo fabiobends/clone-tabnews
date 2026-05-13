@@ -1,4 +1,24 @@
+import { InternalServerError } from "infra/errors";
+
+const availableFeatures = [
+  "read:user",
+  "read:user:self",
+  "create:user",
+  "update:user",
+  "update:user:others",
+  "read:session",
+  "create:session",
+  "read:activation_token",
+  "read:migration",
+  "create:migration",
+  "read:status",
+  "read:status:all",
+];
+
 function can(user, feature, resource) {
+  validateUser(user);
+  validateFeature(feature);
+
   let authorized = false;
 
   if (user.features.includes(feature)) {
@@ -16,7 +36,35 @@ function can(user, feature, resource) {
   return authorized;
 }
 
+function validateUser(user) {
+  if (!user || !user.features) {
+    throw new InternalServerError({
+      cause: "User is required on authorization model.",
+    });
+  }
+}
+
+function validateFeature(feature) {
+  if (!feature || !availableFeatures.includes(feature)) {
+    throw new InternalServerError({
+      cause: "Known feature is required on authorization model",
+    });
+  }
+}
+
+function validateResource(resource) {
+  if (!resource) {
+    throw new InternalServerError({
+      cause: "Resource is required on authorization model",
+    });
+  }
+}
+
 function filterOutput(user, feature, resource) {
+  validateUser(user);
+  validateFeature(feature);
+  validateResource(resource);
+
   if (feature === "read:user" && resource) {
     return {
       id: resource.id,
