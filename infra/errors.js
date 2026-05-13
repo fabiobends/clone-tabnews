@@ -74,11 +74,13 @@ export class ForbiddenError extends Error {
 }
 
 export class ServiceError extends Error {
-  constructor({ cause, message }) {
+  constructor({ cause, message, action, context }) {
     super(message || "Service unavailable", { cause });
     this.name = "ServiceError";
     this.statusCode = 503;
-    this.action = "Please verify if service is available and try again";
+    this.context = context;
+    this.action =
+      action || "Please verify if service is available and try again";
   }
 
   toJSON() {
@@ -87,6 +89,7 @@ export class ServiceError extends Error {
       message: this.message,
       status_code: this.statusCode,
       action: this.action,
+      context: this.context,
     };
   }
 }
