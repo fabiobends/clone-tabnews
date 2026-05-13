@@ -5,8 +5,6 @@ import authorization from "models/authorization";
 import { ForbiddenError } from "infra/errors";
 import { createRouter } from "next-connect";
 
-const router = createRouter();
-
 async function postHandler(req, res) {
   const userValues = req.body;
 
@@ -51,8 +49,8 @@ async function deleteHandler(req, res) {
   res.status(200).json(secureOutput);
 }
 
-router.use(controller.injectAnonymousOrUser);
-router.delete(deleteHandler);
-router.post(controller.canRequest("create:session"), postHandler);
-
-export default router.handler(controller.errorHandlers);
+export default createRouter()
+  .use(controller.injectAnonymousOrUser)
+  .post(controller.canRequest("create:session"), postHandler)
+  .delete(deleteHandler)
+  .handler(controller.errorHandlers);

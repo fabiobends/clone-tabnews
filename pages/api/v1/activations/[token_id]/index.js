@@ -3,8 +3,6 @@ import controller from "infra/controller";
 import activation from "models/activation";
 import authorization from "models/authorization";
 
-const router = createRouter();
-
 async function patchHandler(req, res) {
   const activationTokenId = req.query.token_id;
   const validToken = await activation.findOneValidById(activationTokenId);
@@ -20,7 +18,7 @@ async function patchHandler(req, res) {
   res.status(200).json(secureOutput);
 }
 
-router.use(controller.injectAnonymousOrUser);
-router.patch(controller.canRequest("read:activation_token"), patchHandler);
-
-export default router.handler(controller.errorHandlers);
+export default createRouter()
+  .use(controller.injectAnonymousOrUser)
+  .patch(controller.canRequest("read:activation_token"), patchHandler)
+  .handler(controller.errorHandlers);
