@@ -1,4 +1,5 @@
 import orchestrator from "../../../../orchestrator";
+import webserver from "infra/webserver";
 
 beforeAll(async () => {
   await orchestrator.waitForAllServices();
@@ -10,12 +11,9 @@ describe("POST /api/v1/migrations", () => {
   describe("Anonymous user", () => {
     describe("Runs pending migrations", () => {
       test("For the first time", async () => {
-        const response = await fetch(
-          "http://localhost:3000/api/v1/migrations",
-          {
-            method: "POST",
-          },
-        );
+        const response = await fetch(`${webserver.origin}/api/v1/migrations`, {
+          method: "POST",
+        });
         const responseBody = await response.json();
         expect(response.status).toEqual(403);
         expect(responseBody).toEqual({
@@ -34,15 +32,12 @@ describe("POST /api/v1/migrations", () => {
         const user = await orchestrator.createUser({});
         await orchestrator.activateUser(user);
         const session = await orchestrator.createSession(user.id);
-        const response = await fetch(
-          "http://localhost:3000/api/v1/migrations",
-          {
-            method: "POST",
-            headers: {
-              cookie: `session_id=${session.token}`,
-            },
+        const response = await fetch(`${webserver.origin}/api/v1/migrations`, {
+          method: "POST",
+          headers: {
+            cookie: `session_id=${session.token}`,
           },
-        );
+        });
         const responseBody = await response.json();
         expect(response.status).toEqual(403);
         expect(responseBody).toEqual({
@@ -63,15 +58,12 @@ describe("POST /api/v1/migrations", () => {
         await orchestrator.addFeaturesToUser(user, ["create:migration"]);
         const session = await orchestrator.createSession(user.id);
 
-        const response = await fetch(
-          "http://localhost:3000/api/v1/migrations",
-          {
-            method: "POST",
-            headers: {
-              cookie: `session_id=${session.token}`,
-            },
+        const response = await fetch(`${webserver.origin}/api/v1/migrations`, {
+          method: "POST",
+          headers: {
+            cookie: `session_id=${session.token}`,
           },
-        );
+        });
         const responseBody = await response.json();
         expect(response.status).toEqual(200);
         expect(Array.isArray(responseBody)).toBe(true);

@@ -2,6 +2,7 @@ import { version as uuidVersion } from "uuid";
 import orchestrator from "../../../../orchestrator";
 import user from "models/user";
 import password from "models/password";
+import webserver from "infra/webserver";
 
 beforeAll(async () => {
   await orchestrator.waitForAllServices();
@@ -12,7 +13,7 @@ beforeAll(async () => {
 describe("POST /api/v1/users", () => {
   describe("Anonymous user", () => {
     test("With unique and valid data", async () => {
-      const response = await fetch("http://localhost:3000/api/v1/users", {
+      const response = await fetch(`${webserver.origin}/api/v1/users`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -54,7 +55,7 @@ describe("POST /api/v1/users", () => {
     });
 
     test("With duplicated email ignoring case as well", async () => {
-      const response1 = await fetch("http://localhost:3000/api/v1/users", {
+      const response1 = await fetch(`${webserver.origin}/api/v1/users`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -68,7 +69,7 @@ describe("POST /api/v1/users", () => {
 
       expect(response1.status).toEqual(201);
 
-      const response2 = await fetch("http://localhost:3000/api/v1/users", {
+      const response2 = await fetch(`${webserver.origin}/api/v1/users`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -82,7 +83,7 @@ describe("POST /api/v1/users", () => {
 
       expect(response2.status).toEqual(400);
 
-      const response3 = await fetch("http://localhost:3000/api/v1/users", {
+      const response3 = await fetch(`${webserver.origin}/api/v1/users`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -106,7 +107,7 @@ describe("POST /api/v1/users", () => {
     });
 
     test("With duplicated username", async () => {
-      const response1 = await fetch("http://localhost:3000/api/v1/users", {
+      const response1 = await fetch(`${webserver.origin}/api/v1/users`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -120,7 +121,7 @@ describe("POST /api/v1/users", () => {
 
       expect(response1.status).toEqual(201);
 
-      const response2 = await fetch("http://localhost:3000/api/v1/users", {
+      const response2 = await fetch(`${webserver.origin}/api/v1/users`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -134,7 +135,7 @@ describe("POST /api/v1/users", () => {
 
       expect(response2.status).toEqual(400);
 
-      const response3 = await fetch("http://localhost:3000/api/v1/users", {
+      const response3 = await fetch(`${webserver.origin}/api/v1/users`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -163,7 +164,7 @@ describe("POST /api/v1/users", () => {
       const user1 = await orchestrator.createUser({});
       const user1Session = await orchestrator.createSession(user1.id);
 
-      const user2response = await fetch("http://localhost:3000/api/v1/users", {
+      const user2response = await fetch(`${webserver.origin}/api/v1/users`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
