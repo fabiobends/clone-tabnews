@@ -15,6 +15,7 @@
     "services:setup:database": "npm run services:up && npm run services:wait:database",
     "migrations:create": "node-pg-migrate -m infra/migrations create",
     "migrations:up": "node-pg-migrate -m infra/migrations --envPath .env.development up",
+    "migrations:up:dry": "node-pg-migrate -m infra/migrations --envPath .env.development --dry-run up",
     "migrations:down": "node-pg-migrate -m infra/migrations --envPath .env.development down",
     "lint:prettier:check": "prettier --check .",
     "lint:prettier:fix": "prettier --write .",
