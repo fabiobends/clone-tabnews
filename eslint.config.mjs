@@ -1,25 +1,64 @@
-import { dirname } from "path";
-import { fileURLToPath } from "url";
-import { FlatCompat } from "@eslint/eslintrc";
 import js from "@eslint/js";
-import jestPlugin from "eslint-plugin-jest";
-import prettierConfig from "eslint-config-prettier";
+import globals from "globals";
+import pluginReact from "eslint-plugin-react";
+import pluginJest from "eslint-plugin-jest";
+import json from "@eslint/json";
+import markdown from "@eslint/markdown";
+import css from "@eslint/css";
+import { defineConfig } from "eslint/config";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-const compat = new FlatCompat({
-  baseDirectory: __dirname,
-  recommendedConfig: js.configs.recommended,
-  allConfig: js.configs.all,
-});
-
-const config = [
-  { ignores: [".next/**"] },
-  js.configs.recommended,
-  ...compat.extends("next/core-web-vitals"),
-  jestPlugin.configs["flat/recommended"],
-  prettierConfig,
-];
-
-export default config;
+export default defineConfig([
+  { ignores: [".next/", "package-lock.json"] },
+  {
+    files: ["**/*.{js,mjs,cjs,jsx}"],
+    plugins: { js },
+    extends: ["js/recommended"],
+    languageOptions: { globals: { ...globals.browser, ...globals.node } },
+  },
+  {
+    ...pluginReact.configs.flat.recommended,
+    files: ["**/*.{js,mjs,cjs,jsx}"],
+    settings: { react: { version: "detect" } },
+    rules: {
+      ...pluginReact.configs.flat.recommended.rules,
+      "react/react-in-jsx-scope": "off",
+    },
+  },
+  {
+    files: ["tests/**/*.js"],
+    ...pluginJest.configs["flat/recommended"],
+    languageOptions: {
+      globals: pluginJest.environments.globals.globals,
+    },
+  },
+  {
+    files: ["**/*.json"],
+    plugins: { json },
+    language: "json/json",
+    extends: ["json/recommended"],
+  },
+  {
+    files: ["**/*.jsonc"],
+    plugins: { json },
+    language: "json/jsonc",
+    extends: ["json/recommended"],
+  },
+  {
+    files: ["**/*.json5"],
+    plugins: { json },
+    language: "json/json5",
+    extends: ["json/recommended"],
+  },
+  {
+    files: ["**/*.md"],
+    plugins: { markdown },
+    language: "markdown/gfm",
+    extends: ["markdown/recommended"],
+  },
+  {
+    files: ["**/*.css"],
+    plugins: { css },
+    language: "css/css",
+    extends: ["css/recommended"],
+  },
+]);
